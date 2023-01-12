@@ -1,6 +1,6 @@
 const mongoose=require("mongoose");
 
-const uri="mongodb+srv://Munkhtsog:password@cluster0.0lcnmk0.mongodb.net/tinyUrlDb?retryWrites=true&w=majority";
+const uri="mongodb+srv://Munkhtsog:Munkhtsog2005@cluster0.0lcnmk0.mongodb.net/tinyUrlDb?retryWrites=true&w=majority";
 
 async function connect(){
     try{

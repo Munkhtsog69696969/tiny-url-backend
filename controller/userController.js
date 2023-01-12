@@ -1,4 +1,6 @@
 const User=require("../models/userModel");
+const Url=require("../models/urlModel");
+const randomstring=require("randomstring");
 
 const {body, validationResult} = require('express-validator')
 
@@ -29,4 +31,42 @@ exports.createUser=async(req,res,next)=>{
     } catch (err) {
         next(err)
     }
+}
+
+
+exports.loginUser=async(req,res)=>{
+    const email=req.body.email;
+
+    const password=req.body.password;
+
+    const user=await User.find({email})
+
+    if(user==""){
+        res.send("Email doesnt exist.");
+    }else{
+        if(password===user[0].password){
+            res.send(user);
+        }else{
+            res.send("Email or password incorrect.")
+        }
+    }
+}
+
+exports.getSingleUserFromId=async(req,res)=>{
+    const id=req.params.id;
+
+    const user=await User.findById(id);
+
+    res.send(user);
+}
+
+exports.createUrl=async(req,res)=>{
+    const longUrl=req.body.longUrl;
+    const shortUrl="https://"+randomstring.generate(6);
+
+    const url=await Url.create({longUrl , shortUrl});
+
+    url.save();
+
+    res.send(url);
 }
