@@ -1,36 +1,47 @@
 const User=require("../models/userModel");
 const Url=require("../models/urlModel");
 const randomstring=require("randomstring");
+const jwt=require("jsonwebtoken")
 
 const {body, validationResult} = require('express-validator')
 
 exports.getUsers=async(req,res)=>{
-    const users=await User.find({});
+    // const users=await User.find({});
 
-    res.send(users);
+    // res.send(users);
+    res.send("kk")
 }
 
 exports.createUser=async(req,res,next)=>{
-    const errors = validationResult(req);
-    const email=req.body.email;
-    const existingEmail=await User.find({email})
-    try {
-        if(existingEmail==""){
-            if (!errors.isEmpty() && errors.errors[0].param === 'email') {
-                res.send('Invalid email address. Please try again.')
-            }else if(!errors.isEmpty() && errors.errors[0].param === 'password'){
-                res.send('Password must be longer than 6 characters.')
-            }else{
-                const user = await User.create(req.body)
-                user.save();
-                res.send(user)
-            }
-        }else{
-            res.send("Email exists.")
-        }
-    } catch (err) {
-        next(err)
-    }
+    // const errors = validationResult(req);
+    // const email=req.body.email;
+    // const existingEmail=await User.find({email})
+    // try {
+    //     if(existingEmail==""){
+    //         if (!errors.isEmpty() && errors.errors[0].param === 'email') {
+    //             res.send('Invalid email address. Please try again.')
+    //         }else if(!errors.isEmpty() && errors.errors[0].param === 'password'){
+    //             res.send('Password must be longer than 6 characters.')
+    //         }else{
+    //             const user = await User.create(req.body)
+    //             user.save();
+    //             res.send(user)
+    //         }
+    //     }else{
+    //         res.send("Email exists.")
+    //     }
+    // } catch (err) {
+    //     res.send(err)
+    // }
+
+    const accessToken=jwt.sign(
+        {email:req.body.email , id:"email"},
+        process.env.ACCESS_TOKEN_SECRET || "defaultSecret",
+        {expiresIn:"1d"}
+    )
+
+    res.json({accessToken:accessToken})
+
 }
 
 
@@ -50,6 +61,7 @@ exports.loginUser=async(req,res)=>{
             res.send("Email or password incorrect.")
         }
     }
+
 }
 
 exports.getSingleUserFromId=async(req,res)=>{
@@ -82,7 +94,7 @@ exports.redirect=async(req,res)=>{
 }
 
 exports.getHistory=async(req,res)=>{
-    const datas=await Url.find({shortUrl});
+    const datas=await Url.find({});
 
     res.send(datas);
 }
