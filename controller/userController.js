@@ -62,11 +62,27 @@ exports.getSingleUserFromId=async(req,res)=>{
 
 exports.createUrl=async(req,res)=>{
     const longUrl=req.body.longUrl;
-    const shortUrl="https://"+randomstring.generate(6);
+    const shortUrl="http://localhost:8000/"+randomstring.generate(6);
 
     const url=await Url.create({longUrl , shortUrl});
 
     url.save();
 
     res.send(url);
+}
+
+exports.redirect=async(req,res)=>{
+    const shortUrlEnd=req.params.shortUrl;
+
+    const shortUrl="http://localhost:8000/"+shortUrlEnd;
+
+    const data=await Url.find({shortUrl});
+
+    if(data!==null) return res.redirect(data[0].longUrl);
+}
+
+exports.getHistory=async(req,res)=>{
+    const datas=await Url.find({shortUrl});
+
+    res.send(datas);
 }

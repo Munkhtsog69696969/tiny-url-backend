@@ -9,6 +9,8 @@ const {createUser}=require("../controller/userController");
 const {loginUser}=require("../controller/userController");
 const {getSingleUserFromId}=require("../controller/userController");
 const {createUrl}=require("../controller/userController");
+const {redirect}=require("../controller/userController");
+const {getHistory}=require("../controller/userController");
 
 userRouter
     .get("/users",getUsers)
@@ -20,4 +22,6 @@ userRouter
     .post("/login",loginUser)
     .get("/getUser/:id",getSingleUserFromId)
     .post("/createUrl",createUrl)
+    .get("/:shortUrl",redirect)
+    .get("/history",getHistory)
 module.exports=userRouter;
