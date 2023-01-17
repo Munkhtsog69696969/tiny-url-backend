@@ -1,16 +1,17 @@
 const User=require("../models/userModel");
 const Url=require("../models/urlModel");
 const randomstring=require("randomstring");
-const jwt=require("jsonwebtoken");
+const jwt=require("jsonwebtoken")
+
+const {body, validationResult} = require('express-validator');
 
 require("dotenv").config();
 
-const {body, validationResult} = require('express-validator')
-
 exports.getUsers=async(req,res)=>{
-    const users=await User.find({});
+    // const users=await User.find({});
 
-    res.json(users.filter(user=>user.email===req.email));
+    // res.send(users);
+    res.send("kk")
 }
 
 exports.createUser=async(req,res)=>{
@@ -26,49 +27,50 @@ exports.createUser=async(req,res)=>{
             }else{
                 const user = await User.create(req.body)
                 user.save();
-
-                // const accessToken=jwt.sign(
-                //     {email:req.body.email , id:"user id"},
-                //     process.env.SECRET_TOKEN || "defaultSecret",
-                //     {expiresIn:"1d"},
-                // )
-
-                // res.json({accessToken:accessToken});    
-                // res.send(user)
+                res.send(user)
             }
         }else{
             res.send("Email exists.")
         }
     } catch (err) {
-        res.send(err);
+        res.send(err)
     }
+
 }
 
 
 exports.loginUser=async(req,res)=>{
     const email=req.body.email;
 
-    // const password=req.body.password;
+    const password=req.body.password;
 
-    // const user=await User.find({email})
+    const user=await User.find({email})
 
-    // if(user==""){
-    //     res.send("Email doesnt exist.");
-    // }else{
-    //     if(password===user[0].password){
-    //         res.send(user);
-    //     }else{
-    //         res.send("Email or password incorrect.")
-    //     }
-    // }
+    if(user==""){
+        res.send("Email doesnt exist.");
+    }else{
+        if(password===user[0].password){
+            // res.send(user);
+            
+            const token=jwt.sign(    
+                {email:email},
+                process.env.ACCESS_TOKEN_SECRET || "defaultSecret",
+                {expiresIn:"1d"},
+            )
+            // res.json({token:token});
 
-    const accessToken=jwt.sign(
-        {email:email, id:"user id"},
-        process.env.SECRET_TOKEN || "defaultSecret",
-        {expiresIn:"1d"},
-    )
+            // if(token){
+            //     localStorage.setItem("token" , token);
+            // }
+            res.send(token)
+            
 
-    res.json({accessToken:accessToken});    
+        }else{
+            res.send("Email or password incorrect.")
+        }
+
+    }
+
 }
 
 exports.getSingleUserFromId=async(req,res)=>{
@@ -97,11 +99,13 @@ exports.redirect=async(req,res)=>{
 
     const data=await Url.find({shortUrl});
 
-    if(data!==null) return res.redirect(data[0].longUrl);
+    if(data!==null){
+        res.redirect(data.longUrl);
+    }
 }
 
 exports.getHistory=async(req,res)=>{
-    const datas=await Url.find({shortUrl});
+    const datas=await Url.find({});
 
     res.send(datas);
 }
