@@ -2,10 +2,12 @@ const User=require("../models/userModel");
 const Url=require("../models/urlModel");
 const randomstring=require("randomstring");
 const jwt=require("jsonwebtoken");
+const bcrypt=require("bcrypt");
+
 
 require("dotenv").config();
 
-const {body, validationResult} = require('express-validator')
+const {body, validationResult} = require('express-validator');
 
 exports.getUsers=async(req,res)=>{
     const users=await User.find({});
@@ -24,7 +26,10 @@ exports.createUser=async(req,res)=>{
             }else if(!errors.isEmpty() && errors.errors[0].param === 'password'){
                 res.send('Password must be longer than 6 characters.')
             }else{
-                const user = await User.create(req.body)
+                const password=req.body.password;
+                const salt=bcrypt.genSaltSync(1);
+                const hash=bcrypt.hashSync(password , salt )
+                const user = await User.create({email:email , password:hash});
                 user.save();
                 res.send(user);
             }
@@ -48,7 +53,9 @@ exports.loginUser=async(req,res)=>{
         res.send("Email doesnt exist.");
     }else{
         const userId=await User.find({email});
-        if(password===user[0].password){
+        const matched=await bcrypt.compare(password , user[0].password);
+
+        if(matched){
             const accessToken=jwt.sign(
                 {email:email, id:userId[0]._id},
                 process.env.SECRET_TOKEN || "defaultSecret",
@@ -95,7 +102,6 @@ exports.redirect=async(req,res)=>{
 }
 
 exports.getHistory=async(req,res)=>{
-
     const datas=await Url.find({});
 
     res.send(datas);

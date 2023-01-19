@@ -8,6 +8,7 @@ const {body, validationResult} = require('express-validator')
 
 const userRouter=express.Router();
 
+const tokenGenerator=require("../middleware/tokenGenerator")
 
 const {getUsers}=require("../controller/userController");
 const {createUser}=require("../controller/userController");
