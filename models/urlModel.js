@@ -9,7 +9,9 @@ const urlSchema=new Schema({
     shortUrl:{
         type:String,
         required:false,
-    }
+    },
+
+    userId:String
 
 })
 

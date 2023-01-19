@@ -11,6 +11,8 @@ const userSchema=new Schema({
         required:true,
     },
 
+    urls:[{type:Schema.Types.ObjectId , ref:"urls"}]
+
 })
 
 const User=model("users",userSchema);
